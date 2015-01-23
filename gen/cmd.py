@@ -1,5 +1,5 @@
 import re
-
+import os
 JO_PATTERN = re.compile('(MC12.(?P<id>\d+).PowhegPythia8_AU2CT10_(?P<mode>gg|VBF)H(?P<mass>\d+)_tautau.py)?$')
 DIR_PATTERN = re.compile('(MC12.(?P<id>\d+).PowhegPythia8_AU2CT10_(?P<mode>gg|VBF)H(?P<mass>\d+)_tautau_run(?P<seed>\d+))?$')
 
@@ -60,9 +60,15 @@ def d3pd_cmd(run_dir, input_root):
     return cmd
 
 
-def flat_cmd():
+from . import FLAT_DRIVER
+def flat_cmd(run_dir, input_root):
     """
     TRUTH -> FLAT TREE COMMAND LINE
     """
-
-    pass
+    output_root = 'flat.' + input_root
+    cmd = 'python {0} {1} {2}'.format(
+        FLAT_DRIVER, input_root, output_root)
+    cmd = 'cp {0} {1} && cd {1} && {2}'.format(FLAT_DRIVER, run_dir, cmd)
+    if os.path.exists(os.path.join(run_dir, output_root)):
+        return 'echo "Output already exists !"'
+    return cmd

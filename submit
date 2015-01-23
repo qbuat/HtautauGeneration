@@ -1,15 +1,18 @@
 #!/usr/bin/env python
-from gen import get_jo, generate_cmd, d3pd_cmd
+from gen import get_jo, generate_cmd, d3pd_cmd, flat_cmd
 from gen import SEEDS, MASSES, DSIDS
 from gen.cmd import get_dir_mode, get_dir_mass
+from gen.cmd import JO_PATTERN
 
 import os
+import re
 import cluster
+import subprocess
 from argparse import ArgumentParser
 
 # PARSER
 parser = ArgumentParser(os.path.basename(__file__))
-parser.add_argument('action', type=str, choices=['gen', 'd3pd', 'flat']) 
+parser.add_argument('action', type=str, choices=['gen', 'd3pd', 'flat', 'clean']) 
 parser.add_argument('--dry', action='store_true', default=False)
 parser.add_argument('--mode', nargs='*', default=['VBF', 'gg'], choices=['VBF', 'gg'])
 parser.add_argument('--mass', type=int, default=-1),
@@ -94,3 +97,66 @@ if args.action == 'd3pd':
                 submit_cluster(cmd,name)
             except KeyboardInterrupt:
                 break
+
+# 3) TRUTH_NTUP -> FLAT step
+if args.action == 'flat':
+    for dirpath, dirnames, files in os.walk('./prod/'):
+        if dirpath != "./prod/":
+            break
+        
+        dirnames = filter(lambda d: get_dir_mode(d) in args.mode, dirnames)
+        if args.mass != -1:
+            dirnames = filter(lambda d: get_dir_mass(d) in masses, dirnames)
+        flat_cmds = {}
+        for d in dirnames:
+            for f in os.listdir(os.path.join('prod', d)):
+                if f[0:4] == 'ntup' and '.root' in f:
+                    cmd = flat_cmd(os.path.join('prod', d), f)
+                    name = '_'.join([args.action, d, f])
+                    flat_cmds[name] = cmd
+
+        print flat_cmds.keys()
+        for name, cmd in flat_cmds.items():
+            try:
+                submit_cluster(cmd,name)
+            except KeyboardInterrupt:
+                break
+
+# 4) CLEANING
+if args.action == 'clean':
+    for dirpath, dirnames, files in os.walk('./prod/'):
+        if dirpath != "./prod/":
+            break
+        
+        dirnames = filter(lambda d: get_dir_mode(d) in args.mode, dirnames)
+        if args.mass != -1:
+            dirnames = filter(lambda d: get_dir_mass(d) in masses, dirnames)
+        clean_cmds = {}
+
+        KEEP_PATTERNS = ['EVNT', 'flat', 'ntup']
+        KEEP_FILES = ['Generate.log']
+
+        def rm_file(f):
+            if f[0:4] in KEEP_PATTERNS and '.root' in f:
+                return False
+            elif f in KEEP_FILES:
+                return False
+            elif re.match(JO_PATTERN, f):
+                return False
+            else:
+                return True
+
+        for d in dirnames:
+            files = os.listdir(os.path.join('prod', d))
+            files = filter(lambda f: rm_file(f), files)
+            for f in files:
+                cmd = 'rm -rf {0}'.format(os.path.join(
+                        'prod', d, f))
+                name = '_'.join([args.action, d, f])
+                clean_cmds[name] = cmd
+
+        for _, cmd in clean_cmds.items():
+            if args.dry:
+                print cmd
+            else:
+                subprocess.call(cmd, shell=True)
