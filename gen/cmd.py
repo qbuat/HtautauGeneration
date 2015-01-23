@@ -1,7 +1,22 @@
 import re
 
+JO_PATTERN = re.compile('(MC12.(?P<id>\d+).PowhegPythia8_AU2CT10_(?P<mode>gg|VBF)H(?P<mass>\d+)_tautau.py)?$')
+DIR_PATTERN = re.compile('(MC12.(?P<id>\d+).PowhegPythia8_AU2CT10_(?P<mode>gg|VBF)H(?P<mass>\d+)_tautau_run(?P<seed>\d+))?$')
 
-JO_PATTERN = re.compile('(MC12.(?P<id>\d+).PowhegPythia8_AU2CT10_(?P<mode>ggH|VBFH)(?P<mass>\d+)_tautau.py)?$')
+def get_dir_mode(d):
+    match = re.match(DIR_PATTERN, d)
+    if match:
+        return match.group('mode')
+    else:
+        return None
+
+def get_dir_mass(d):
+    match = re.match(DIR_PATTERN, d)
+    if match:
+        return int(match.group('mass'))
+    else:
+        return None
+
 
 def generate_cmd(jo, seed=1234, nevents=5000):
     """

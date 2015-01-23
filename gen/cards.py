@@ -104,9 +104,12 @@ evgenConfig.generators += [ 'Powheg', 'Pythia8' ]
 from yellowhiggs import br
 from yellowhiggs.xsbr import __BR as BRs
 masses_yh = BRs['2boson'].keys()
-print masses_yh
 
 def get_jo(mass=125, mode='VBF'):
+    """
+    Determine width from yellowhiggs report
+    and output a jo file for a given m_H
+    """
     best_mass = sorted(masses_yh, key=lambda m: abs(m - float(mass)))[0]
     width = br(best_mass, '2boson')[0]
     print '%s: Mass = %s; Width = %s (calculated with m_H = %s)' % (mode, mass, width, best_mass)
