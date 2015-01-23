@@ -1,0 +1,7 @@
+joboptions/*
+prod/*
+test/*
+log/*
+*pyc
+*~
+.asetup.save

@@ -1,0 +1,75 @@
+#!/usr/bin/env python
+from gen import get_jo, generate_cmd
+from gen import SEEDS, MASSES, DSIDS
+
+
+import os
+import cluster
+from argparse import ArgumentParser
+
+# PARSER
+parser = ArgumentParser()
+parser.add_argument('--dry', action='store_true', default=False)
+parser.add_argument('--mass', type=int, default=-1),
+args = parser.parse_args()
+
+if args.mass != -1:
+    masses = [args.mass]
+else:
+    masses = MASSES
+
+setup = cluster.get_setup(os.path.join(
+        os.path.dirname(cluster.__file__), 'setup.sfu.txt'))
+
+log_dir = os.path.join(os.getcwd(), 'log')
+
+for dirpath, _, files in os.walk('./prod/'):
+    if dirpath != "./prod/":
+        break
+    for m, dsid in zip(MASSES, DSIDS):
+        if not m in masses:
+            continue
+
+        print '=' * 50
+        jo_vbf = get_jo(m, 'VBF')
+        jo_vbf_name = 'MC12.{0}.PowhegPythia8_AU2CT10_{1}H{2}_tautau.py'.format(
+            dsid, 'VBF', m)
+        print jo_vbf_name
+        with open(os.path.join('joboptions', jo_vbf_name), 'w') as f:
+            f.write(jo_vbf)
+
+        # VBF GEN COMMAND
+        cmd_vbf = generate_cmd(jo_vbf_name)
+
+        print '-' * 20
+        jo_ggh = get_jo(m, 'gg')
+        jo_ggh_name = 'MC12.{0}.PowhegPythia8_AU2CT10_{1}H{2}_tautau.py'.format(
+            dsid, 'gg', m)
+        with open(os.path.join('joboptions', jo_ggh_name), 'w') as f:
+            f.write(jo_ggh)
+        print jo_ggh_name
+
+        # ggH GEN COMMAND
+        cmd_ggh = generate_cmd(jo_ggh_name)
+
+
+        try:
+            if cmd_vbf:
+                cmd_vbf = "cd %s && %s && %s" % (os.getcwd(), setup, cmd_vbf)
+                cluster.qsub(
+                    cmd_vbf,
+                    name=jo_vbf_name, 
+                    stderr_path=log_dir, 
+                    stdout_path=log_dir, 
+                    dry_run=args.dry)
+            if cmd_ggh:
+                cmd_ggh = "cd %s && %s && %s" % (os.getcwd(), setup, cmd_ggh)
+                cluster.qsub(
+                    cmd_ggh,
+                    name=jo_ggh_name, 
+                    stderr_path=log_dir, 
+                    stdout_path=log_dir, 
+                    dry_run=args.dry)
+        except KeyboardInterrupt:
+            break
+
