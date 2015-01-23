@@ -30,9 +30,11 @@ else:
 # qsub setup
 setup = cluster.get_setup(os.path.join(
         os.path.dirname(cluster.__file__), 'setup.sfu.txt'))
+setup_root_only = cluster.get_setup(os.path.join(
+        os.path.dirname(cluster.__file__), 'setup.sfu.root.txt'))
 log_dir = os.path.join(os.getcwd(), 'log')
 
-def submit_cluster(cmd, name):
+def submit_cluster(cmd, name, setup=setup):
     cmd = "cd %s && %s && %s" % (os.getcwd(), setup, cmd)
     cluster.qsub(
         cmd, name=name, 
@@ -83,6 +85,7 @@ if args.action == 'd3pd':
         dirnames = filter(lambda d: get_dir_mode(d) in args.mode, dirnames)
         if args.mass != -1:
             dirnames = filter(lambda d: get_dir_mass(d) in masses, dirnames)
+        print dirnames
         d3pd_cmds = {}
         for d in dirnames:
             for f in os.listdir(os.path.join('prod', d)):
@@ -118,7 +121,7 @@ if args.action == 'flat':
         print flat_cmds.keys()
         for name, cmd in flat_cmds.items():
             try:
-                submit_cluster(cmd,name)
+                submit_cluster(cmd,name, setup=setup_root_only)
             except KeyboardInterrupt:
                 break
 
