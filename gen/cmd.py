@@ -39,7 +39,7 @@ def generate_cmd(jo, seed=1234, nevents=5000):
             "evgenJobOpts=MC12JobOpts-00-14-70_v8.tar.gz"
             ]
         cmd = ' '.join(cmd_args)
-        cmd = 'mkdir prod/{0} && mv joboptions/{1} prod/{0}/ && cd prod/{0} && '.format(run_dir, jo) + cmd
+        cmd = 'mkdir -p prod/{0} && mv joboptions/{1} prod/{0}/ && cd prod/{0} && '.format(run_dir, jo) + cmd
         return cmd
     else:
         return None
