@@ -64,7 +64,7 @@ PowhegConfig.use_massive_b = True
 PowhegConfig.use_massive_c = True
 
 # Increase number of events requested to compensate for filter efficiency
-PowhegConfig.nEvents *= 15
+PowhegConfig.nEvents *= 20
 
 # Generate Powheg events
 PowhegConfig.generateRunCard()

@@ -1,3 +1,9 @@
+import logging
+import os
+
+log = logging.getLogger('gen')
+
+
 SEEDS = [123456000 + i for i in range(0, 50)]
 MASSES = range(60, 205, 5)
 DSIDS = [300000 + i for i in xrange(len(MASSES))]

@@ -53,6 +53,8 @@ sys.stdout.write( 'Will run over ' + str(nevts) + ' events ...\n' )
 sys.stdout.flush()
 
 itree.SetBranchStatus( '*', 0 )
+itree.SetBranchStatus( 'RunNumber', 1 )
+itree.SetBranchStatus( 'EventNumber', 1 )
 itree.SetBranchStatus( 'mc_*', 1 )
 itree.SetBranchStatus( 'mcevt_*', 1 )
 itree.SetBranchStatus( 'MET_Truth_Int_*', 1 )
@@ -125,6 +127,9 @@ def met_energy_resolution(SumET):
 
 #----------------------------------------
                 
+br_runnumber = array( 'i', [0] )
+br_evtnumber = array( 'i', [0] )
+
 br_weight = array( 'd', [0] )
                 
 br_bad_event = array( 'i', [0] )
@@ -244,6 +249,9 @@ br_pttot_lep1_lep2_sm     = array( 'd', [0] )
 br_ptdiff_lep1_lep2_sm    = array( 'd', [0] )
 
 #----------------------------------------
+
+otree.Branch('runnumber', br_runnumber, 'runnumber/I')
+otree.Branch('evtnumber', br_evtnumber, 'evtnumber/I')
 
 otree.Branch( 'weight', br_weight, 'weight/D' )
 otree.Branch( 'bad_event', br_bad_event, 'bad_event/I' )
@@ -415,7 +423,9 @@ for ievt in xrange( nevts ):
     itree.GetEntry( ievt )
 
     br_weight[0] = itree.mcevt_weight[0][0]
-
+    br_runnumber[0] = itree.RunNumber
+    br_evtnumber[0] = itree.EventNumber
+    print itree.RunNumber, itree.EventNumber
     ############################
     ## Get the Higgs
     ############################
