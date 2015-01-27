@@ -29,13 +29,13 @@ topAlg.Pythia8.Commands += [
                             ]
 
 #-----------------------------------------------------------------------
-# Filter the tau kinematics: 2 taus with p_T(l)>20 GeV and |eta(l)| <2.5 
-# l: e, mu or hadronic tau
+# Filter the tau kinematics: 2 taus with p_T(l/h)>10/20 GeV and |eta(l/h)| <2.5 
+# l: e, mu; h: hadronic tau
 #-----------------------------------------------------------------------
 include('MC12JobOptions/TauFilter.py')
 topAlg.TauFilter.Ntaus = 2
-topAlg.TauFilter.Ptcute = 20000.0 #MeV
-topAlg.TauFilter.Ptcutmu = 20000.0 #MeV
+topAlg.TauFilter.Ptcute = 12000.0 #MeV
+topAlg.TauFilter.Ptcutmu = 12000.0 #MeV
 topAlg.TauFilter.Ptcuthad = 20000.0 #MeV
 
 #--------------------------------------------------------------
@@ -81,13 +81,13 @@ topAlg.Pythia8.Commands += [
                             ]
 
 #-----------------------------------------------------------------------
-# Filter the tau kinematics: 2 taus with p_T(l)>20 GeV and |eta(l)| <2.5 
-# l: e, mu or hadronic tau
+# Filter the tau kinematics: 2 taus with p_T(l/h)>20 GeV and |eta(l/h)| <2.5 
+# l: e, mu; h: hadronic tau
 #-----------------------------------------------------------------------
 include('MC12JobOptions/TauFilter.py')
 topAlg.TauFilter.Ntaus = 2
-topAlg.TauFilter.Ptcute = 20000.0 #MeV
-topAlg.TauFilter.Ptcutmu = 20000.0 #MeV
+topAlg.TauFilter.Ptcute = 12000.0 #MeV
+topAlg.TauFilter.Ptcutmu = 12000.0 #MeV
 topAlg.TauFilter.Ptcuthad = 20000.0 #MeV
 
 #--------------------------------------------------------------
