@@ -111,3 +111,8 @@ class TrueTauBlock(TrueTau.prefix('tau1_') + TrueTau.prefix('tau2_') + TrueMet.p
             tree.pt_ratio_tau1_tau2 = vis_tau1.Pt() / vis_tau2.Pt()
         else:
             tree.pt_ratio_tau1_tau2 = 0
+
+
+def get_model():
+    model = EventModel + TrueTauBlock + FourMomentum.prefix('higgs')
+    return model

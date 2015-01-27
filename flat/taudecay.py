@@ -180,7 +180,7 @@ class TauDecay(object):
 
     @cached_property
     def decay_angle(self):
-        return self.decay_vect.Angle(self.fourvect_visible)
+        return self.decay_vect.Angle(self.fourvect_vis)
 
     @cached_property
     def npi0(self):
@@ -201,7 +201,7 @@ class TauDecay(object):
         return self.init.fourvect
 
     @cached_property
-    def fourvect_visible(self):
+    def fourvect_vis(self):
         return self.fourvect - self.fourvect_missing
 
     @cached_property
@@ -211,11 +211,11 @@ class TauDecay(object):
 
     @cached_property
     def dr_vistau_nu(self):
-        return self.fourvect_visible.DeltaR(self.fourvect_missing)
+        return self.fourvect_vis.DeltaR(self.fourvect_missing)
 
     @cached_property
     def dtheta3d_vistau_nu(self):
-        return self.fourvect_visible.Angle(self.fourvect_missing)
+        return self.fourvect_vis.Angle(self.fourvect_missing)
 
     def __str__(self):
         return self.__repr__()

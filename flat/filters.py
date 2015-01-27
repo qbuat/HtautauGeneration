@@ -16,7 +16,7 @@ class TrueTaus(EventFilter):
 
     def passes(self, event):
         event.taus.select(
-            lambda tau: tau.status == 2 and event.mc[tau.parent_index].pdgId == 25)
+            lambda tau: tau.status == 2 and event.mc_pdgId[tau.parent_index[0]] == 25)
         return len(event.taus) == 2
 
 class TrueJets(EventFilter):
@@ -34,12 +34,12 @@ class TrueJets(EventFilter):
                               not any([tau for tau in event.taus if
                                        utils.dR(jet.eta, jet.phi,
                                                 tau.eta, tau.phi) < 0.4]))
-
+        return True
 
 class Higgs(EventFilter):
 
     def __init__(self, tree, **kwargs):
-        super(HiggsPT, self).__init__(**kwargs)
+        super(Higgs, self).__init__(**kwargs)
         self.tree = tree
         self.status = (62, 195)
         
@@ -56,6 +56,5 @@ class Higgs(EventFilter):
         if higgs is None:
             raise RuntimeError("Higgs not found!")
 
-        event.higgs = higgs
         return True
 
