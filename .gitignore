@@ -1,5 +1,6 @@
 joboptions/*
-prod/*
+prod*
+
 test/*
 log/*
 *pyc
