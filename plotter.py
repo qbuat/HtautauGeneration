@@ -4,6 +4,7 @@ from argparse import ArgumentParser
 from rootpy.io import root_open
 from rootpy.plotting import Hist, Canvas
 from rootpy.plotting.style import set_style
+from rootpy.tree import Cut
 from rootpy import ROOT
 from rootpy import asrootpy
 from ROOT import TLatex
@@ -39,19 +40,21 @@ set_style('ATLAS', shape='rect')
 ROOT.gROOT.SetBatch(True)
 
 hist_array = {}
-
-for dirpath, dirnames, files in os.walk('./prod/'):
-    if dirpath != "./prod/":
+cut = Cut()
+DIR_PATH = './prod/'
+# DIR_PATH = '/cluster/data03/qbuat/HtautauGeneration/prod/'
+for dirpath, dirnames, files in os.walk(DIR_PATH):
+    if dirpath != DIR_PATH:
         break
         
     dirnames = filter(lambda d: get_dir_mode(d) in args.mode, dirnames)
     if args.mass != -1:
         dirnames = filter(lambda d: get_dir_mass(d) in masses, dirnames)
     for d in dirnames:
-        for f in os.listdir(os.path.join('prod', d)):
+        for f in os.listdir(os.path.join(DIR_PATH, d)):
             if f[0:4] == 'flat' and '.root' in f:
                 with root_open(os.path.join(
-                        'prod', d, f)) as froot:
+                        DIR_PATH, d, f)) as froot:
                     tree = froot[args.tree_name]
                     for key, var_info in variables.items():
                         h = Hist(var_info['bins'], var_info['range'][0], var_info['range'][1])
@@ -66,13 +69,19 @@ for dirpath, dirnames, files in os.walk('./prod/'):
                                 var_info['name'], h.name,
                                 (var_info['bins'], var_info['range'][0], var_info['range'][1]))
                         print expr
-                        tree.Draw(expr)
+                        tree.Draw(expr, cut, var_info['style'])
                         h =  asrootpy(ROOT.gPad.GetPrimitive(h.name))
                         h.xaxis.title = get_label(var_info)
                         h.yaxis.title = 'Number of Events'
+                        if h.integral() != 0:
+                            h /= h.integral() 
                         h.SetLineWidth(2)
+                        if 'binlabels' in var_info.keys():
+                            for ib, lab in enumerate(var_info['binlabels']):
+                                h.xaxis.SetBinLabel(ib + 1, lab)
+
                         c = Canvas()
-                        c.SetLogy()
+                        # c.SetLogy()
                         c.SetTopMargin(0.08)
                         h.Draw('HIST')
                         label = ROOT.TLatex(
@@ -83,4 +92,4 @@ for dirpath, dirnames, files in os.walk('./prod/'):
                         label.SetTextSize(20)
                         label.Draw('same')
                         c.SaveAs('./plots/{0}_mass{1}_mode{2}.png'.format(
-                                var_info['name'], get_dir_mass(d), get_dir_mode(d)))
+                                key, get_dir_mass(d), get_dir_mode(d)))
