@@ -7,16 +7,17 @@ from math import *
 from .units import GeV
 from . import utils
 from . import log; log = log[__name__]
-
+from .taudecay import TauDecay
+from .models import FourMomentum
 
 class TrueTaus(EventFilter):
 
-    def __init__(self, **kwargs):
+    def __init__(self, tree, **kwargs):
         super(TrueTaus, self).__init__(**kwargs)
-
+        self.tree = tree
     def passes(self, event):
-        event.taus.select(
-            lambda tau: tau.status == 2 and event.mc_pdgId[tau.parent_index[0]] == 25)
+        event.taus = [tau for tau in self.tree.higgs.iter_children() 
+                      if abs(tau.pdgId) == pdg.tau and tau.status == 2]
         return len(event.taus) == 2
 
 class TrueJets(EventFilter):
@@ -35,6 +36,26 @@ class TrueJets(EventFilter):
                                        utils.dR(jet.eta, jet.phi,
                                                 tau.eta, tau.phi) < 0.4]))
         return True
+
+
+class ClassifyDecay(EventFilter):
+    def __init__(self, tree, **kwargs):
+        super(ClassifyDecay, self).__init__(**kwargs)
+        self.tree = tree
+    def passes(self, event):
+        tau1, tau2 = event.taus
+        tau1.decay = TauDecay(tau1)
+        tau2.decay = TauDecay(tau2)
+        if tau1.decay.hadronic and tau2.decay.hadronic:
+            self.tree.hadhad = 1
+        elif tau1.decay.hadronic and tau2.decay.leptonic or\
+                tau1.decay.leptonic and tau2.decay.hadronic:
+            self.tree.lephad = 1
+        elif tau1.decay.leptonic and tau2.decay.leptonic:
+            self.tree.leplep = 1
+
+        return True
+    
 
 class Higgs(EventFilter):
 
@@ -55,6 +76,7 @@ class Higgs(EventFilter):
                 break
         if higgs is None:
             raise RuntimeError("Higgs not found!")
-
+        
+        self.tree.higgs = higgs
         return True
 

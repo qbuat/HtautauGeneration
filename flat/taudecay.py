@@ -107,6 +107,9 @@ class TauDecay(object):
                 self.valid = False
 
     @cached_property
+    def leptonic(self):
+        return self.leptonic_electron or self.leptonic_muon
+    @cached_property
     def has_charged_rho(self):
         if pdg.rho_plus in self.child_pdgid_freq:
             return True

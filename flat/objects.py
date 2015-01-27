@@ -6,14 +6,16 @@ def define_objects(tree):
 
     tree.define_collection(
         name="taus",
-        prefix="tau_",
-        size="tau_n",
-        mix=MCTauFourMomentum)
+        prefix="mc_",
+        size="mc_n",
+        mix=MCParticle)
+
     tree.define_collection(
         name="mc",
         prefix="mc_",
         size="mc_n",
         mix=MCParticle)
+
     tree.define_collection(
         name="jets",
         prefix="jet_AntiKt4TruthJets_",

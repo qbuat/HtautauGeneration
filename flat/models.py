@@ -1,23 +1,22 @@
-"""
-TreeModels common to both lephad and hadhad analyses
-"""
 from ROOT import TLorentzVector
 
 from rootpy.tree import TreeModel, FloatCol, IntCol, BoolCol, CharCol
 from rootpy.vector import LorentzRotation, LorentzVector, Vector3, Vector2
+from rootpy.extern.hep import pdg
 from rootpy import log
 ignore_warning = log['/ROOT.TVector3.PseudoRapidity'].ignore(
     '.*transvers momentum.*')
 
+from .taudecay import TauDecay
 
 class EventModel(TreeModel):
     runnumber = IntCol()
     evtnumber = IntCol()
+    weight = FloatCol()
     hadhad = IntCol() # 1 or 0
     lephad = IntCol() # 1 or 0
     leplep = IntCol() # 1 or 0
-    channel = IntCol() # 1 (hh), 2 (lh), 3(hh)
-
+    
 class FourMomentum(TreeModel):
     pt = FloatCol()
     p = FloatCol()
@@ -44,10 +43,8 @@ class FourMomentum(TreeModel):
 
 class TrueMet(FourMomentum):
     @classmethod
-    def set(cls, this, tau1, tau2):
-        met1 = tau1.fourvect - tau1.fourvect_vis
-        met2 = tau2.fourvect - tau2.fourvect_vis
-        FourMomentum.set(this, met1 + met2)
+    def set(cls, this, miss1, miss2):
+        FourMomentum.set(this, miss1 + miss2)
 
 class TrueTau(FourMomentum + FourMomentum.prefix('vis_')):
     nProng = IntCol(default=-1111)
@@ -55,6 +52,7 @@ class TrueTau(FourMomentum + FourMomentum.prefix('vis_')):
     charge = IntCol()
     flavor = CharCol()
     pdgId = IntCol(default=-1111)
+    index = IntCol()
     @classmethod
     def set_vis(cls, this, other):
         if isinstance(other, TLorentzVector):
@@ -93,17 +91,42 @@ class TrueTauBlock(TrueTau.prefix('tau1_') + TrueTau.prefix('tau2_') + TrueMet.p
 
     @classmethod 
     def set(cls, tree, tau1, tau2):
-        tree_object = tree.tau1
-        TrueTau.set(tree_object, tau1.fourvect)
-        TrueTau.set_vis(tree_object, tau1.fourvect_vis)
-        tree_oject = tree.tau2
-        TrueTau.set(tree_object, tau2.fourvect)
-        TrueTau.set_vis(tree_object, tau2.fourvect_vis)
-        tree_object = tree.met
-        TrueMet.set(tree_object, tau1, tau2)
 
-        vis_tau1 = tau1.fourvect_vis
-        vis_tau2 = tau1.fourvect_vis
+
+        TrueTau.set(tree.tau1, tau1.fourvect)
+        TrueTau.set(tree.tau2, tau2.fourvect)
+
+        tau1_decay = TauDecay(tau1)
+        tau2_decay = TauDecay(tau2)
+
+        TrueTau.set_vis(tree.tau1, tau1_decay.fourvect_vis)
+        TrueTau.set_vis(tree.tau2, tau2_decay.fourvect_vis)
+
+
+        tree.tau1.index = tau1.index
+        tree.tau1.charge = tau1.charge
+        tree.tau1.flavor = 'l' if tau1_decay.leptonic else 'h'
+        if tree.tau1.flavor == 'l':
+            tree.tau1.pdgId = pdg.mu if tau1_decay.leptonic_muon else pdg.e
+        else:
+            tree.tau1.nProng = tau1_decay.nprong
+            tree.tau1.nPi0s = tau1_decay.nneutrals
+        
+        tree.tau2.index = tau2.index
+        tree.tau2.charge = tau2.charge
+        tree.tau2.charge = tau2.charge
+        tree.tau2.flavor = 'l' if tau2_decay.leptonic else 'h'
+        if tree.tau2.flavor == 'l':
+            tree.tau2.pdgId = pdg.mu if tau2_decay.leptonic_muon else pdg.e
+        else:
+            tree.tau2.nProng = tau2_decay.nprong
+            tree.tau2.nPi0s = tau2_decay.nneutrals
+
+
+        TrueMet.set(tree.met, tau1_decay.fourvect_missing, tau2_decay.fourvect_missing)
+
+        vis_tau1 = tau1_decay.fourvect_vis
+        vis_tau2 = tau1_decay.fourvect_vis
         tree.dR_taus = vis_tau1.DeltaR(vis_tau2)
         tree.dEta_taus = abs(vis_tau1.Eta() - vis_tau2.Eta())
         tree.dPhi_taus = abs(vis_tau1.DeltaPhi(vis_tau2))
@@ -114,5 +137,5 @@ class TrueTauBlock(TrueTau.prefix('tau1_') + TrueTau.prefix('tau2_') + TrueMet.p
 
 
 def get_model():
-    model = EventModel + TrueTauBlock + FourMomentum.prefix('higgs')
+    model = EventModel + TrueTauBlock + FourMomentum.prefix('higgs_')
     return model
