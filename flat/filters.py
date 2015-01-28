@@ -12,11 +12,12 @@ from .models import FourMomentum
 
 class TrueTaus(EventFilter):
 
-    def __init__(self, tree, **kwargs):
+    def __init__(self, **kwargs):
         super(TrueTaus, self).__init__(**kwargs)
-        self.tree = tree
+
     def passes(self, event):
-        event.taus = [tau for tau in self.tree.higgs.iter_children() 
+        higgs = event.higgs[0]
+        event.taus = [tau for tau in higgs.iter_children() 
                       if abs(tau.pdgId) == pdg.tau and tau.status == 2]
         return len(event.taus) == 2
 
@@ -42,6 +43,7 @@ class ClassifyDecay(EventFilter):
     def __init__(self, tree, **kwargs):
         super(ClassifyDecay, self).__init__(**kwargs)
         self.tree = tree
+
     def passes(self, event):
         tau1, tau2 = event.taus
         tau1.decay = TauDecay(tau1)
@@ -59,9 +61,8 @@ class ClassifyDecay(EventFilter):
 
 class Higgs(EventFilter):
 
-    def __init__(self, tree, **kwargs):
+    def __init__(self, **kwargs):
         super(Higgs, self).__init__(**kwargs)
-        self.tree = tree
         self.status = (62, 195)
         
     def passes(self, event):
@@ -71,12 +72,10 @@ class Higgs(EventFilter):
         # find the Higgs
         for mc in event.mc:
             if mc.pdgId == 25 and mc.status in status:
-                pt = mc.pt
                 higgs = mc
                 break
         if higgs is None:
             raise RuntimeError("Higgs not found!")
-        
-        self.tree.higgs = higgs
+        event.higgs = [higgs]
         return True
 

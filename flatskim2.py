@@ -33,12 +33,8 @@ count_funcs = {
     'mc_weight': mc_weight_count,
 }
 event_filters = EventFilterList([
-        Higgs(
-            count_funcs=count_funcs,
-            tree=outtree),
-        TrueTaus(
-            count_funcs=count_funcs,
-            tree=outtree),
+        Higgs(count_funcs=count_funcs),
+        TrueTaus(count_funcs=count_funcs),
         ClassifyDecay(
             count_funcs=count_funcs,
             tree=outtree),
@@ -73,9 +69,12 @@ for event in chain:
     event.taus.sort(key=lambda tau: tau.pt, reverse=True)
     event.jets.sort(key=lambda jet: jet.pt, reverse=True)
 
+    # Set variables describing the two taus 
+    # and the ditau system
     tau1, tau2 = event.taus
     TrueTauBlock.set(outtree, tau1, tau2)
-    FourMomentum.set(outtree.higgs, outtree.higgs.fourvect)
+
+    FourMomentum.set(outtree.higgs, event.higgs[0])
     outtree.Fill(reset=-1)
     
 

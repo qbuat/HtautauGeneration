@@ -16,6 +16,7 @@ __all__ = [
     'FourMomentum',
     'FourMomentumMeV',
     'MCParticle',
+    'MCTauParticle',
     'MCTauFourMomentum',
 ]
 
@@ -258,3 +259,9 @@ class MCParticle(FourMomentum):
              self.m,
              self.pt / GeV,
              self.eta, self.phi))
+
+class MCTauParticle(MCParticle):
+    
+    def __init__(self):
+        super(MCTauParticle, self).__init__()
+        self.decay = None

@@ -96,40 +96,38 @@ class TrueTauBlock(TrueTau.prefix('tau1_') + TrueTau.prefix('tau2_') + TrueMet.p
         TrueTau.set(tree.tau1, tau1.fourvect)
         TrueTau.set(tree.tau2, tau2.fourvect)
 
-        tau1_decay = TauDecay(tau1)
-        tau2_decay = TauDecay(tau2)
-
-        TrueTau.set_vis(tree.tau1, tau1_decay.fourvect_vis)
-        TrueTau.set_vis(tree.tau2, tau2_decay.fourvect_vis)
+        TrueTau.set_vis(tree.tau1, tau1.decay.fourvect_vis)
+        TrueTau.set_vis(tree.tau2, tau2.decay.fourvect_vis)
 
 
         tree.tau1.index = tau1.index
         tree.tau1.charge = tau1.charge
-        tree.tau1.flavor = 'l' if tau1_decay.leptonic else 'h'
+        tree.tau1.flavor = 'l' if tau1.decay.leptonic else 'h'
         if tree.tau1.flavor == 'l':
-            tree.tau1.pdgId = pdg.mu if tau1_decay.leptonic_muon else pdg.e
+            tree.tau1.pdgId = pdg.mu if tau1.decay.leptonic_muon else pdg.e
         else:
-            tree.tau1.nProng = tau1_decay.nprong
-            tree.tau1.nPi0s = tau1_decay.nneutrals
+            tree.tau1.nProng = tau1.decay.nprong
+            tree.tau1.nPi0s = tau1.decay.nneutrals
         
         tree.tau2.index = tau2.index
         tree.tau2.charge = tau2.charge
         tree.tau2.charge = tau2.charge
-        tree.tau2.flavor = 'l' if tau2_decay.leptonic else 'h'
+        tree.tau2.flavor = 'l' if tau2.decay.leptonic else 'h'
         if tree.tau2.flavor == 'l':
-            tree.tau2.pdgId = pdg.mu if tau2_decay.leptonic_muon else pdg.e
+            tree.tau2.pdgId = pdg.mu if tau2.decay.leptonic_muon else pdg.e
         else:
-            tree.tau2.nProng = tau2_decay.nprong
-            tree.tau2.nPi0s = tau2_decay.nneutrals
+            tree.tau2.nProng = tau2.decay.nprong
+            tree.tau2.nPi0s = tau2.decay.nneutrals
 
 
-        TrueMet.set(tree.met, tau1_decay.fourvect_missing, tau2_decay.fourvect_missing)
+        TrueMet.set(tree.met, tau1.decay.fourvect_missing, tau2.decay.fourvect_missing)
 
-        vis_tau1 = tau1_decay.fourvect_vis
-        vis_tau2 = tau1_decay.fourvect_vis
+        vis_tau1 = tau1.decay.fourvect_vis
+        vis_tau2 = tau2.decay.fourvect_vis
         tree.dR_taus = vis_tau1.DeltaR(vis_tau2)
         tree.dEta_taus = abs(vis_tau1.Eta() - vis_tau2.Eta())
         tree.dPhi_taus = abs(vis_tau1.DeltaPhi(vis_tau2))
+
         if vis_tau2.Pt() != 0:
             tree.pt_ratio_tau1_tau2 = vis_tau1.Pt() / vis_tau2.Pt()
         else:

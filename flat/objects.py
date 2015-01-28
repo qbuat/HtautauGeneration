@@ -8,7 +8,7 @@ def define_objects(tree):
         name="taus",
         prefix="mc_",
         size="mc_n",
-        mix=MCParticle)
+        mix=MCTauParticle)
 
     tree.define_collection(
         name="mc",
@@ -17,6 +17,13 @@ def define_objects(tree):
         mix=MCParticle)
 
     tree.define_collection(
+        name="higgs",
+        prefix="mc_",
+        size="mc_n",
+        mix=MCParticle)
+
+    tree.define_collection(
         name="jets",
         prefix="jet_AntiKt4TruthJets_",
         size="jet_AntiKt4TruthJets_n")
+    
