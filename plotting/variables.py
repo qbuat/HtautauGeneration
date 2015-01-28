@@ -7,22 +7,50 @@ def get_label(variable):
 
 
 VARIABLES = {
-    'taup_pt': {
-        'name': 'taup_pt',
-        'root': '#tau^{+} p_{T}',
+    'tau1_pt': {
+        'name': 'tau1_pt',
+        'root': 'Leading p_{T}',
         'units': 'GeV',
         'scale': 0.001,
         'bins': 10,
-        'range': (0, 200),
+        'range': (0, 40),
         'style': 'HIST',
         },
+    'tau2_pt': {
+        'name': 'tau2_pt',
+        'root': 'Subleading p_{T}',
+        'units': 'GeV',
+        'scale': 0.001,
+        'bins': 10,
+        'range': (0, 40),
+        'style': 'HIST',
+        },
+    'tau1_vis_pt': {
+        'name': 'tau1_vis_pt',
+        'root': 'Leading p_{T, visible}',
+        'units': 'GeV',
+        'scale': 0.001,
+        'bins': 10,
+        'range': (0, 40),
+        'style': 'HIST',
+        },
+    'tau2_vis_pt': {
+        'name': 'tau2_vis_pt',
+        'root': 'Subleading p_{T, visible}',
+        'units': 'GeV',
+        'scale': 0.001,
+        'bins': 10,
+        'range': (0, 40),
+        'style': 'HIST',
+        },
+
     'taum_pt': {
         'name': 'taum_pt',
         'root': '#tau^{-} p_{T}',
         'units': 'GeV',
         'scale': 0.001,
         'bins': 10,
-        'range': (0, 200),
+        'range': (0, 120),
         'style': 'HIST',
         },
     'taup_eta': {
@@ -45,7 +73,7 @@ VARIABLES = {
         'units': 'GeV',
         'scale': 0.001,
         'bins': 10,
-        'range': (0, 200),
+        'range': (0, 120),
         'style': 'HIST',
         },
     'lep2_pt': {
@@ -54,7 +82,7 @@ VARIABLES = {
         'units': 'GeV',
         'scale': 0.001,
         'bins': 10,
-        'range': (0, 200),
+        'range': (0, 120),
         'style': 'HIST',
         },
     'lep1_eta': {

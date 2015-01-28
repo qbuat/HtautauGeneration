@@ -72,3 +72,16 @@ def flat_cmd(run_dir, input_root):
     if os.path.exists(os.path.join(run_dir, output_root)):
         return 'echo "Output already exists !"'
     return cmd
+
+def flat2_cmd(run_dir, input_root):
+    """
+    TRUTH -> FLAT TREE COMMAND LINE
+    """
+    output_root = 'flat2.' + input_root
+    input_abs = os.path.join(run_dir, input_root)
+    output_abs = os.path.join(run_dir, output_root)
+    cmd = 'python {0} {1} {2}'.format(
+        FLAT_DRIVER, input_abs, output_abs)
+    if os.path.exists(os.path.join(run_dir, output_root)):
+        return 'echo "Output already exists !"'
+    return cmd

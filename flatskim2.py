@@ -11,7 +11,13 @@ from flat.filters import *
 from flat.objects import define_objects
 import flat.branches as branches
 
-output = root_open('toto.root', 'recreate')
+parser = ArgumentParser()
+parser.add_argument('input', type=str, help='input file name')
+parser.add_argument('output', type=str, help='output file name')
+parser.add_argument('--tree-name', type=str, default='truth', help='Input tree name')
+args = parser.parse_args()
+
+output = root_open(args.output, 'recreate')
 output.cd()
 model = get_model()
 outtree = Tree(name='Tree', model=model)
@@ -39,15 +45,15 @@ event_filters = EventFilterList([
         TrueJets(count_funcs=count_funcs),
         ])
 
-files = ['prod_filter20/MC12.300004.PowhegPythia8_AU2CT10_ggH80_tautau_run1234/ntup.EVNT_300004_seed1234.root']
+files = [args.input]
 
 # peek at first tree to determine which branches to exclude
 with root_open(files[0]) as test_file:
-    test_tree = test_file.Get('truth')
+    test_tree = test_file.Get(args.tree_name)
     ignore_branches = test_tree.glob(branches.REMOVE)
 
 chain = TreeChain(
-    'truth', 
+    args.tree_name, 
     files=files, 
     filters=event_filters,
     cache=True,

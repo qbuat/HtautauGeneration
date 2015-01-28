@@ -17,8 +17,8 @@ parser = ArgumentParser(os.path.basename(__file__))
 parser.add_argument('--var', type=str, default='')
 parser.add_argument('--tree-name', type=str, default='Tree')
 parser.add_argument('--mode', nargs='*', default=['VBF', 'gg'], choices=['VBF', 'gg'])
-parser.add_argument('--mass', type=int, default=-1),
-
+parser.add_argument('--mass', type=int, default=-1)
+parser.add_argument('--cut', type=str, default='')
 args = parser.parse_args()
 
 if args.mass in MASSES:
@@ -36,11 +36,12 @@ else:
     raise RuntimeError('Wrong input variable')
 
 
+
 set_style('ATLAS', shape='rect')
 ROOT.gROOT.SetBatch(True)
 
 hist_array = {}
-cut = Cut()
+cut = Cut(args.cut)
 DIR_PATH = './prod/'
 # DIR_PATH = '/cluster/data03/qbuat/HtautauGeneration/prod/'
 for dirpath, dirnames, files in os.walk(DIR_PATH):
@@ -52,7 +53,7 @@ for dirpath, dirnames, files in os.walk(DIR_PATH):
         dirnames = filter(lambda d: get_dir_mass(d) in masses, dirnames)
     for d in dirnames:
         for f in os.listdir(os.path.join(DIR_PATH, d)):
-            if f[0:4] == 'flat' and '.root' in f:
+            if f[0:5] == 'flat2' and '.root' in f:
                 with root_open(os.path.join(
                         DIR_PATH, d, f)) as froot:
                     tree = froot[args.tree_name]
@@ -70,12 +71,13 @@ for dirpath, dirnames, files in os.walk(DIR_PATH):
                                 (var_info['bins'], var_info['range'][0], var_info['range'][1]))
                         print expr
                         tree.Draw(expr, cut, var_info['style'])
-                        h =  asrootpy(ROOT.gPad.GetPrimitive(h.name))
+                        h = asrootpy(ROOT.gPad.GetPrimitive(h.name))
                         h.xaxis.title = get_label(var_info)
                         h.yaxis.title = 'Number of Events'
                         if h.integral() != 0:
                             h /= h.integral() 
                         h.SetLineWidth(2)
+                        h.yaxis.SetRangeUser(0, 0.5)
                         if 'binlabels' in var_info.keys():
                             for ib, lab in enumerate(var_info['binlabels']):
                                 h.xaxis.SetBinLabel(ib + 1, lab)
