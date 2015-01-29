@@ -7,6 +7,7 @@ from rootpy.extern.hep import pdg
 from . import log; log = log[__name__]
 from .utils import dR, et2pt
 from .units import GeV
+
 """
 This module contains "mixin" classes for adding
 functionality to Tree objects ("decorating" them).
@@ -265,3 +266,4 @@ class MCTauParticle(MCParticle):
     def __init__(self):
         super(MCTauParticle, self).__init__()
         self.decay = None
+ 

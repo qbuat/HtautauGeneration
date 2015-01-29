@@ -119,7 +119,7 @@ class TrueTauBlock(TrueTau.prefix('tau1_') + TrueTau.prefix('tau2_') + TrueMet.p
             tree.tau2.nProng = tau2.decay.nprong
             tree.tau2.nPi0s = tau2.decay.nneutrals
 
-
+        MET = tau1.decay.fourvect_missing + tau2.decay.fourvect_missing
         TrueMet.set(tree.met, tau1.decay.fourvect_missing, tau2.decay.fourvect_missing)
 
         vis_tau1 = tau1.decay.fourvect_vis
@@ -127,6 +127,23 @@ class TrueTauBlock(TrueTau.prefix('tau1_') + TrueTau.prefix('tau2_') + TrueMet.p
         tree.dR_taus = vis_tau1.DeltaR(vis_tau2)
         tree.dEta_taus = abs(vis_tau1.Eta() - vis_tau2.Eta())
         tree.dPhi_taus = abs(vis_tau1.DeltaPhi(vis_tau2))
+        
+        vis_taus = vis_tau1 + vis_tau2
+
+        tree.dPhi_taus_met = abs(vis_taus.DeltaPhi(MET))
+        tree.dPhi_tau1_met = abs(vis_tau1.DeltaPhi(MET))
+        tree.dPhi_tau2_met = abs(vis_tau2.DeltaPhi(MET))
+        
+        tree.pt_sum_taus_met = (vis_taus + MET).Pt()
+        tree.pt_tot_taus_met = 0 # TO BE SET
+
+        tree.pt_sum_tau1_tau2 = vis_taus.Pt()
+        tree.pt_tot_tau1_tau2 = 0 # TO BE SET
+
+        tree.transverse_mass_tau1_tau2 = vis_taus.Mt() 
+        tree.transverse_mass_tau1_met = (vis_tau1 + MET).Mt()
+        tree.transverse_mass_tau2_met = (vis_tau2 + MET).Mt()
+
 
         if vis_tau2.Pt() != 0:
             tree.pt_ratio_tau1_tau2 = vis_tau1.Pt() / vis_tau2.Pt()
