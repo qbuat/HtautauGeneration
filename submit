@@ -15,7 +15,9 @@ parser = ArgumentParser(os.path.basename(__file__))
 parser.add_argument('action', type=str, choices=['gen', 'd3pd', 'flat', 'flat2', 'clean']) 
 parser.add_argument('--dry', action='store_true', default=False)
 parser.add_argument('--mode', nargs='*', default=['VBF', 'gg'], choices=['VBF', 'gg'])
-parser.add_argument('--mass', type=int, default=-1),
+parser.add_argument('--mass', type=int, default=-1)
+parser.add_argument('--events', type=int, default=5000, help='Number of event to generate per chunk')
+parser.add_argument('--chunks', type=int, default=1, help='Chunks of event generation')
 
 args = parser.parse_args()
 print args
@@ -64,11 +66,13 @@ if args.action == 'gen':
                     f.write(jo)
 
                 # GEN COMMAND
-                cmd = generate_cmd(jo_name)
-                name = jo_name
-                gen_cmds[name] = cmd
-                print '-' * 20
+                for ichunk, seed in enumerate(SEEDS):
+                    if ichunk < args.chunks:
+                        cmd = generate_cmd(jo_name, seed=seed, nevents=args.events)
+                        name = jo_name + '_' + str(seed)
+                        gen_cmds[name] = cmd
         
+            print '-' * 20
             for name, cmd in gen_cmds.items():
                 try:
                     submit_cluster(cmd, name)
