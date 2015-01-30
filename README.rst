@@ -44,3 +44,10 @@ Cleaning the run directory
 * To cleanup the prod directory from the garbage files::
 
   ./submit clean
+
+Test of the flattening driver
+-----------------------------
+
+* To test and debug the flat2 skimmer::
+
+  python flatskim2.py input.root output.root
