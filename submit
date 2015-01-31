@@ -106,11 +106,10 @@ if args.action == 'd3pd':
                 break
 
 # 3) TRUTH_NTUP -> FLAT step
-if args.action == 'flat' or args.action == 'flat2':
-    if args.action == 'flat':
-        flatter = flat_cmd
-    elif args.action == 'flat2':
-        flatter = flat2_cmd
+if args.action == 'flat': 
+    print 'DEPRECATED flattening code ! Will be soon completly disabled'
+
+if args.action == 'flat2':
     for dirpath, dirnames, files in os.walk(PROD_DIR):
         if dirpath != PROD_DIR:
             break
@@ -122,7 +121,7 @@ if args.action == 'flat' or args.action == 'flat2':
         for d in dirnames:
             for f in os.listdir(os.path.join(PROD_DIR, d)):
                 if f[0:4] == 'ntup' and '.root' in f:
-                    cmd = flatter(os.path.join(PROD_DIR, d), f)
+                    cmd = flat2_cmd(d, f)
                     name = '_'.join([args.action, d, f])
                     flat_cmds[name] = cmd
 

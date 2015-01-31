@@ -9,6 +9,7 @@ MASSES = range(60, 205, 5)
 DSIDS = [300000 + i for i in xrange(len(MASSES))]
 
 PROD_DIR = '/cluster/data09/qbuat/HtautauGeneration/prod'
+NTUPLE_DIR = './ntuple'
 FLAT_DRIVER = 'flatskim.py'
 FLAT_DRIVER_2 = 'flatskim2.py'
 
