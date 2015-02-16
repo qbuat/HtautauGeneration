@@ -9,8 +9,9 @@ Setup
 
 * Create symbolic links::
 
-  ln -s /cluster/data03/HtautauGeneration/prod prod
-  ln -s your_own_output_area ntuple
+   ln -s /cluster/data03/qbuat/HtautauGeneration/prod prod
+
+   ln -s your_own_output_area ntuple
 
 * Source the setup script::
 
