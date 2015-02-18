@@ -56,5 +56,5 @@ Test of the flattening driver
 
 * To test and debug the flat2 skimmer::
 
-  python flatskim2.py input.root output.root
+   python flatskim2.py input.root output.root
 

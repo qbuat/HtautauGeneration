@@ -10,7 +10,7 @@ from flat.models import *
 from flat.filters import *
 from flat.objects import define_objects
 import flat.branches as branches
-
+from flat import log; log = log[__name__]
 parser = ArgumentParser()
 parser.add_argument('input', type=str, help='input file name')
 parser.add_argument('output', type=str, help='output file name')
