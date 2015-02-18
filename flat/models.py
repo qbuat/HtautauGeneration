@@ -135,7 +135,7 @@ class TrueTauBlock(TrueTau.prefix('tau1_') + TrueTau.prefix('tau2_') + TrueMet.p
         tree.dPhi_tau2_met = abs(vis_tau2.DeltaPhi(MET))
         
         tree.pt_sum_taus_met = (vis_taus + MET).Pt()
-        tree.pt_tot_taus_met = 0 # TO BE SET
+        tree.pt_tot_taus_met = ( tlv_tau1 + tlv_lep2 + tlv_met ).Pt() / ( lep1_pt + lep2_pt + met_et ) # TO BE SET
 
         tree.pt_sum_tau1_tau2 = vis_taus.Pt()
         tree.pt_tot_tau1_tau2 = 0 # TO BE SET
