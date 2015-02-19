@@ -5,7 +5,13 @@ Setup
 
 * Create output directories::
 
-   mkdir prod; mkdir plots; mkdir log; mkdir joboptions
+  mkdir plots; mkdir log; mkdir joboptions
+
+* Create symbolic links::
+
+   ln -s /cluster/data03/qbuat/HtautauGeneration/prod prod
+
+   ln -s your_own_output_area ntuple
 
 * Source the setup script::
 
@@ -35,7 +41,7 @@ Making flat trees with variables of interest
 
 * There is two drivers for two flavor of flat trees (flat and flat2)::
 
-  ./submit flat
+  ./submit flat # DEPRECATED
   ./submit flat2
 
 
@@ -50,4 +56,5 @@ Test of the flattening driver
 
 * To test and debug the flat2 skimmer::
 
-  python flatskim2.py input.root output.root
+   python flatskim2.py input.root output.root
+

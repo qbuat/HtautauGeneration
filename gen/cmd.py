@@ -17,6 +17,13 @@ def get_dir_mass(d):
     else:
         return None
 
+def get_dir_seed(d):
+    match = re.match(DIR_PATTERN, d)
+    if match:
+        return int(match.group('seed'))
+    else:
+        return None
+
 
 def generate_cmd(jo, seed=1234, nevents=5000):
     """
@@ -73,16 +80,19 @@ def flat_cmd(run_dir, input_root):
         return 'echo "Output already exists !"'
     return cmd
 
-from . import FLAT_DRIVER_2
-def flat2_cmd(run_dir, input_root):
+from . import FLAT_DRIVER_2, PROD_DIR, NTUPLE_DIR
+def flat2_cmd(d, input_root):
     """
     TRUTH -> FLAT TREE COMMAND LINE
     """
-    output_root = 'flat2.' + input_root
-    input_abs = os.path.join(run_dir, input_root)
-    output_abs = os.path.join(run_dir, output_root)
+    mode = get_dir_mode(d)
+    mass = get_dir_mass(d)
+    seed = get_dir_seed(d)
+    output_root = 'flat_{0}{1}_seed{2}.root'.format(mode, mass, seed)
+    input_abs = os.path.join(PROD_DIR, d, input_root)
+    output_abs = os.path.join(NTUPLE_DIR, 'running', output_root)
     cmd = 'python {0} {1} {2}'.format(
         FLAT_DRIVER_2, input_abs, output_abs)
-    if os.path.exists(os.path.join(run_dir, output_root)):
+    if os.path.exists(output_abs):
         return 'echo "Output already exists !"'
     return cmd
