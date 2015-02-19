@@ -1,6 +1,6 @@
 joboptions/*
 prod*
-
+*root
 test/*
 log/*
 *pyc
