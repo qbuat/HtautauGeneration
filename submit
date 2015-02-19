@@ -110,6 +110,7 @@ if args.action == 'flat':
     print 'DEPRECATED flattening code ! Will be soon completly disabled'
 
 if args.action == 'flat2':
+
     for dirpath, dirnames, files in os.walk(PROD_DIR):
         if dirpath != PROD_DIR:
             break
