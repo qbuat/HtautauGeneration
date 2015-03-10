@@ -18,3 +18,21 @@ function sfu()
 }
 
 sfu
+
+
+# This script will work in either bash or zsh.
+
+# deterine path to this script
+# http://stackoverflow.com/questions/59895/can-a-bash-script-tell-what-directory-its-stored-in
+SOURCE_HTAUTAUGENERATION_SETUP="${BASH_SOURCE[0]:-$0}"
+
+DIR_HTAUTAUGENERATION_SETUP="$( dirname "$SOURCE_HTAUTAUGENERATION_SETUP" )"
+while [ -h "$SOURCE_HTAUTAUGENERATION_SETUP" ]
+do
+  SOURCE_HTAUTAUGENERATION_SETUP="$(readlink "$SOURCE_HTAUTAUGENERATION_SETUP")"
+  [[ $SOURCE_HTAUTAUGENERATION_SETUP != /* ]] && SOURCE_HTAUTAUGENERATION_SETUP="$DIR_HTAUTAUGENERATION_SETUP/$SOURCE_HTAUTAUGENERATION_SETUP"
+  DIR_HTAUTAUGENERATION_SETUP="$( cd -P "$( dirname "$SOURCE_HTAUTAUGENERATION_SETUP"  )" && pwd )"
+done
+DIR_HTAUTAUGENERATION_SETUP="$( cd -P "$( dirname "$SOURCE_HTAUTAUGENERATION_SETUP" )" && pwd )"
+
+#echo "sourcing ${SOURCE_HTAUTAUGENERATION_SETUP}..."

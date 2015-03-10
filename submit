@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-from gen import get_jo, generate_cmd, d3pd_cmd, flat2_cmd, flat_cmd
+from gen import generate_cmd, d3pd_cmd, flat2_cmd, flat_cmd
 from gen import SEEDS, MASSES, DSIDS, PROD_DIR
 from gen.cmd import get_dir_mode, get_dir_mass
 from gen.cmd import JO_PATTERN
@@ -12,12 +12,15 @@ from argparse import ArgumentParser
 
 # PARSER
 parser = ArgumentParser(os.path.basename(__file__))
-parser.add_argument('action', type=str, choices=['gen', 'd3pd', 'flat', 'flat2', 'clean']) 
+parser.add_argument('action', type=str, choices=['make_jo', 'gen', 'd3pd', 'flat', 'flat2', 'clean']) 
 parser.add_argument('--dry', action='store_true', default=False)
 parser.add_argument('--mode', nargs='*', default=['VBF', 'gg'], choices=['VBF', 'gg'])
 parser.add_argument('--mass', type=int, default=-1)
 parser.add_argument('--events', type=int, default=5000, help='Number of event to generate per chunk')
 parser.add_argument('--chunks', type=int, default=1, help='Chunks of event generation')
+parser.add_argument(
+    '--delete-evnt-file', action='store_true', 
+    default=False, help='Remove the EVNT file from the run directory')
 
 args = parser.parse_args()
 print args
@@ -45,39 +48,44 @@ def submit_cluster(cmd, name, setup=setup):
         dry_run=args.dry)
 
 
+# 0)  Make the JO files
+if args.action == 'make_jo':
+    from gen.cards import get_jo
+    for m, dsid in zip(MASSES, DSIDS):
+        for mode in args.mode:
+            jo = get_jo(m, mode)
+            jo_name = 'MC12.{0}.PowhegPythia8_AU2CT10_{1}H{2}_tautau.py'.format(
+                dsid, mode, m)
+            print jo_name
+            with open(os.path.join('joboptions', jo_name), 'w') as f:
+                f.write(jo)
+
 # 1) Event generation block
 if args.action == 'gen':
-    for dirpath, _, files in os.walk(PROD_DIR):
-        if dirpath != PROD_DIR:
-            break
+    for m, dsid in zip(MASSES, DSIDS):
+        if not m in masses:
+            continue
 
-        for m, dsid in zip(MASSES, DSIDS):
-            if not m in masses:
-                continue
+        print '=' * 50
+        gen_cmds = {}
+        for mode in args.mode:
+            jo_name = 'MC12.{0}.PowhegPythia8_AU2CT10_{1}H{2}_tautau.py'.format(
+                dsid, mode, m)
+            print jo_name
 
-            print '=' * 50
-            gen_cmds = {}
-            for mode in args.mode:
-                jo = get_jo(m, mode)
-                jo_name = 'MC12.{0}.PowhegPythia8_AU2CT10_{1}H{2}_tautau.py'.format(
-                    dsid, mode, m)
-                print jo_name
-                with open(os.path.join('joboptions', jo_name), 'w') as f:
-                    f.write(jo)
-
-                # GEN COMMAND
-                for ichunk, seed in enumerate(SEEDS):
-                    if ichunk < args.chunks:
-                        cmd = generate_cmd(jo_name, seed=seed, nevents=args.events)
-                        name = jo_name + '_' + str(seed)
-                        gen_cmds[name] = cmd
+            # GEN COMMAND
+            for ichunk, seed in enumerate(SEEDS):
+                if ichunk < args.chunks:
+                    cmd = generate_cmd(jo_name, seed=seed, nevents=args.events)
+                    name = jo_name + '_' + str(seed)
+                    gen_cmds[name] = cmd
         
-            print '-' * 20
-            for name, cmd in gen_cmds.items():
-                try:
-                    submit_cluster(cmd, name)
-                except KeyboardInterrupt:
-                    break
+        print '-' * 20
+        for name, cmd in gen_cmds.items():
+            try:
+                submit_cluster(cmd, name)
+            except KeyboardInterrupt:
+                break
 
 
 # 2) EVNT -> TRUTH_NTUP step
@@ -145,6 +153,8 @@ if args.action == 'clean':
         clean_cmds = {}
 
         KEEP_PATTERNS = ['EVNT', 'flat', 'ntup']
+        if args.delete_evnt_file:
+            KEEP_PATTERNS = KEEP_PATTERNS[1:]
         KEEP_FILES = ['Generate.log']
 
         def rm_file(f):
@@ -170,4 +180,5 @@ if args.action == 'clean':
             if args.dry:
                 print cmd
             else:
+                print cmd
                 subprocess.call(cmd, shell=True)

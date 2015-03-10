@@ -1,5 +1,8 @@
 import re
 import os
+
+from . import PROD_DIR
+
 JO_PATTERN = re.compile('(MC12.(?P<id>\d+).PowhegPythia8_AU2CT10_(?P<mode>gg|VBF)H(?P<mass>\d+)_tautau.py)?$')
 DIR_PATTERN = re.compile('(MC12.(?P<id>\d+).PowhegPythia8_AU2CT10_(?P<mode>gg|VBF)H(?P<mass>\d+)_tautau_run(?P<seed>\d+))?$')
 
@@ -46,7 +49,7 @@ def generate_cmd(jo, seed=1234, nevents=5000):
             "evgenJobOpts=MC12JobOpts-00-14-70_v8.tar.gz"
             ]
         cmd = ' '.join(cmd_args)
-        cmd = 'mkdir -p prod/{0} && mv joboptions/{1} prod/{0}/ && cd prod/{0} && '.format(run_dir, jo) + cmd
+        cmd = 'mkdir -p {0}/{1} && cp joboptions/{2} {0}/{1}/ && cd {0}/{1} && '.format(PROD_DIR, run_dir, jo) + cmd
         return cmd
     else:
         return None
@@ -80,7 +83,7 @@ def flat_cmd(run_dir, input_root):
         return 'echo "Output already exists !"'
     return cmd
 
-from . import FLAT_DRIVER_2, PROD_DIR, NTUPLE_DIR
+from . import FLAT_DRIVER_2, NTUPLE_DIR
 def flat2_cmd(d, input_root):
     """
     TRUTH -> FLAT TREE COMMAND LINE
